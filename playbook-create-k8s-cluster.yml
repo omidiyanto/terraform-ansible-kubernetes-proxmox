@@ -4,12 +4,11 @@
   become: yes
   tasks:
     - name: Load Kernel Modules
-      lineinfile:
-        path: /etc/modules-load.d/k8s.conf
-        line: "{{ item }}"
-      loop:
-        - overlay
-        - br_netfilter
+      copy:
+        dest: /etc/modules-load.d/k8s.conf
+        content: |
+          overlay
+          br_netfilter
 
     - name: Load overlay and br_netfilter modules
       command: modprobe {{ item }}
@@ -105,5 +104,5 @@
         state: started
         enabled: true
 
-    
+
     
