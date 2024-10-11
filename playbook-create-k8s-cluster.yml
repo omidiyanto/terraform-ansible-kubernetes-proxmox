@@ -144,13 +144,12 @@
   tasks:
     - name: Remove old containerd config.toml
       command: |
-        rm -rf /etc/containerd.config.toml
+        rm -rf /etc/containerd/config.toml
         systemctl restart containerd.service
 
     - name: Initialize Kubernetes cluster
-      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
+      command: sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
       register: kubeadm_output
-      ignore_errors: yes
 
 - name: Finishing Initialization of control-plane (master-node)
   hosts: master-node
@@ -164,7 +163,6 @@
     - name: Copy admin.conf to .kube/config
       command: sudo cp /etc/kubernetes/admin.conf .kube/config
       
-
     - name: Change ownership of .kube/config
       command: sudo chown {{ ansible_user }}:{{ ansible_user }} .kube/config
       
@@ -180,19 +178,23 @@
       command: kubeadm token create --print-join-command
       register: join_command
 
-    - name: Set join command fact
+    - name: Set join command as group variable
       set_fact:
-        join_command: "{{ join_command.stdout }}"
-        ansible_host_join_command: "{{ join_command.stdout }}"
+        ansible_group_join_command: "{{ join_command.stdout }}"
+        group: master-node
 
     - name: Show join command
       debug:
-        var: join_command
+        var: ansible_group_join_command
 
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
   tasks:
+    - name: Check join command
+      debug:
+        var: hostvars['master-node']['ansible_group_join_command']
+
     - name: Join worker node to the cluster
-      command: "{{ hostvars['master-node']['ansible_host_join_command'] }}"
-      when: hostvars['master-node']['ansible_host_join_command'] is defined
+      command: "{{ hostvars['master-node']['ansible_group_join_command'] }}"
+      when: hostvars['master-node']['ansible_group_join_command'] is defined
