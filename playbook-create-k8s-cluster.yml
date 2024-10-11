@@ -179,18 +179,22 @@
     - name: Create join command
       command: kubeadm token create --print-join-command
       register: join_command
-      
+
+    - name: Set join command fact
+      set_fact:
+        join_command: "{{ join_command.stdout }}"
+
     - name: Show join command
       debug:
-        var: join_command.stdout
+        var: join_command
 
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
   tasks:
     - name: Join worker node to the cluster
-      command: "{{ hostvars['master-node']['join_command'].stdout }}"
-      when: hostvars['master-node']['join_command'].stdout is defined
+      command: "{{ join_command }}"
+      when: join_command is defined
 
 
     
