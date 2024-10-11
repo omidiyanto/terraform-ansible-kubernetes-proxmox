@@ -64,8 +64,8 @@ resource "proxmox_vm_qemu" "k8s-master" {
 }
 
 resource "proxmox_vm_qemu" "k8s-workers" {
-    count = var.count_number
-    name = "k8s-worker${count.index + 1}"
+    count = var.vm_count
+    name = "k8s-worker-${count.index + 1}"
     target_node = "proxmox"
     vmid = 300 + (count.index + 1)
 
