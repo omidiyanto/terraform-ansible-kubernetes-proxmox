@@ -183,6 +183,7 @@
     - name: Set join command fact
       set_fact:
         join_command: "{{ join_command.stdout }}"
+        ansible_host_join_command: "{{ join_command.stdout }}"
 
     - name: Show join command
       debug:
@@ -193,8 +194,8 @@
   become: yes
   tasks:
     - name: Join worker node to the cluster
-      command: "{{ join_command }}"
-      when: join_command is defined
+      command: "{{ hostvars['master-node']['ansible_host_join_command'] }}"
+      when: hostvars['master-node']['ansible_host_join_command'] is defined
 
 
     
