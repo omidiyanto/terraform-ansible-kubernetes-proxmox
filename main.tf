@@ -143,9 +143,9 @@ EOT
 }
 
 
-resource "null_resource" "ansible_playbook" {
-    depends_on = [local_file.create_ansible_inventory]
-    provisioner "local-exec" {
-        command = "ansible-playbook -i ./inventory.ini playbook-create-k8s-cluster.yml"
-    }
-}
+# resource "null_resource" "ansible_playbook" {
+#     depends_on = [local_file.create_ansible_inventory]
+#     provisioner "local-exec" {
+#         command = "ansible-playbook -i ./inventory.ini playbook-create-k8s-cluster.yml"
+#     }
+# }
