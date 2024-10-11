@@ -17,13 +17,12 @@
         - br_netfilter
 
     - name: Set sysctl parameters for Kubernetes
-      lineinfile:
-        path: /etc/sysctl.d/k8s.conf
-        line: "{{ item }}"
-      loop:
-        - net.bridge.bridge-nf-call-ip6tables = 1
-        - net.bridge.bridge-nf-call-iptables = 1
-        - net.ipv4.ip_forward = 1
+      copy:
+        dest: /etc/sysctl.d/k8s.conf
+        content: |
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.bridge.bridge-nf-call-iptables = 1
+          net.ipv4.ip_forward = 1
       
     - name: Apply sysctl settings
       command: sysctl --system
@@ -45,9 +44,9 @@
         mode: '0755'
 
     - name: Add Docker Repository
-      lineinfile:
-        path: /etc/apt/sources.list.d/docker.list
-        line: 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable'
+      copy:
+        dest: /etc/apt/sources.list.d/docker.list
+        content: 'deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable'
     
     - name: Install Docker and Containerd
       apt:
@@ -84,9 +83,9 @@
       command: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
     - name: Add Kubernetes Repository
-      lineinfile:
-        path: /etc/apt/sources.list.d/kubernetes.list
-        line: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /'
+      copy:
+        dest: /etc/apt/sources.list.d/kubernetes.list
+        content: 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /'
 
     - name: Install Kubernetes Pacakges
       apt:
