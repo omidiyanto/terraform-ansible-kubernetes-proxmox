@@ -139,5 +139,13 @@ ${proxmox_vm_qemu.k8s-master.default_ipv4_address}
 ${join("\n", [for worker in proxmox_vm_qemu.k8s-workers : worker.default_ipv4_address])}
 EOT
 
-  filename = "${path.module}/inventory.ini"
+  filename = "./inventory.ini"
+}
+
+
+resource "null_resource" "ansible_playbook" {
+    depends_on = [local_file.create_ansible_inventory]
+    provisioner "local-exec" {
+        command = "ansible-playbook -i ./inventory.ini playbook-create-k8s-cluster.yml"
+    }
 }
