@@ -196,6 +196,3 @@
     - name: Join worker node to the cluster
       command: "{{ hostvars['master-node']['ansible_host_join_command'] }}"
       when: hostvars['master-node']['ansible_host_join_command'] is defined
-
-
-    
