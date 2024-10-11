@@ -119,3 +119,15 @@ resource "proxmox_vm_qemu" "k8s-workers" {
      ]
   }
 }
+
+output "vm-info" {
+  value = [
+    for vm in concat(
+      [proxmox_vm_qemu.k8s-master],
+      proxmox_vm_qemu.k8s-workers
+    ) : {
+      hostname = vm.name
+      ip_addr  = vm.default_ipv4_address
+    }
+  ]
+}
