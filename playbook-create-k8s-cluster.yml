@@ -175,7 +175,7 @@
         mode: '0755'
 
     - name: Copy admin.conf to .kube/config
-      command: sudo cp /etc/kubernetes/admin.conf .kube/config
+      command: sudo cp -f /etc/kubernetes/admin.conf .kube/config
       
     - name: Change ownership of .kube/config
       command: sudo chown {{ ansible_user }}:{{ ansible_user }} .kube/config
@@ -200,35 +200,35 @@
         flat: yes
         
 
-- name: Configure worker-nodes to join 
-  hosts: worker-node
-  become: yes
-  tasks:
-  - name: Copy join command to worker-node
-    copy:
-      src: /tmp/join_command.txt
-      dest: /tmp/
+# - name: Configure worker-nodes to join 
+#   hosts: worker-node
+#   become: yes
+#   tasks:
+#   - name: Copy join command to worker-node
+#     copy:
+#       src: /tmp/join_command.txt
+#       dest: /tmp/
       
 
-  - name: join cluster
-    shell: "{{ lookup('file', '/tmp/join_command.txt') }} > node_joined.txt"
-    args:
-      chdir: $HOME
-      creates: node_joined.txt
+#   - name: join cluster
+#     shell: "{{ lookup('file', '/tmp/join_command.txt') }} > node_joined.txt"
+#     args:
+#       chdir: $HOME
+#       creates: node_joined.txt
 
-- name: Apply CNI flannel on master-node
-  hosts: master-node
-  tasks:
-    - name: Copy kube-flannel.yml to the master-node
-      copy:
-        src: ./kube-flannel.yml
-        dest: ./kube-flannel.yml
+# - name: Apply CNI flannel on master-node
+#   hosts: master-node
+#   tasks:
+#     - name: Copy kube-flannel.yml to the master-node
+#       copy:
+#         src: ./kube-flannel.yml
+#         dest: ./kube-flannel.yml
 
-    - name: Check if Flannel network is already applied
-      command: ip a show flannel.1
-      register: flannel_network
-      ignore_errors: yes
+#     - name: Check if Flannel network is already applied
+#       command: ip a show flannel.1
+#       register: flannel_network
+#       ignore_errors: yes
 
-    - name: Apply Flannel network configuration
-      command: kubectl apply -f kube-flannel.yml
-      when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
+#     - name: Apply Flannel network configuration
+#       command: kubectl apply -f kube-flannel.yml
+#       when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
