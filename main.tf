@@ -133,6 +133,8 @@ resource "null_resource" "update_hosts" {
 
   provisioner "local-exec" {
     command = <<EOT
+      #!/bin/bash
+
       # Update /etc/hosts for master node
       if grep -q "${proxmox_vm_qemu.k8s-master.name}" /etc/hosts; then
         sed -i "s/.*${proxmox_vm_qemu.k8s-master.name}.*/${proxmox_vm_qemu.k8s-master.default_ipv4_address}  ${proxmox_vm_qemu.k8s-master.name}/" /etc/hosts
@@ -153,6 +155,7 @@ resource "null_resource" "update_hosts" {
     EOT
   }
 }
+
 
 
 resource "local_file" "create_ansible_inventory" {
