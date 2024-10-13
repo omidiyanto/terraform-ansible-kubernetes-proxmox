@@ -206,8 +206,8 @@
         content: "{{ join_command }}"
         dest: /tmp/join_command.txt
 
-    - name: Copy join command to host
-      copy: 
+    - name: fetch join command to host
+      fetch: 
         src: /tmp/join_command.txt
         dest: /tmp/join_command.txt
 
