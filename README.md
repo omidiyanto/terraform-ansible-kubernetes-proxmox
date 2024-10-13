@@ -86,6 +86,3 @@ Before you begin, ensure you have the following set up:
 	
 8. **FINISH**
 <br>
-
-### Video Guides
-Watch this video below to see more detailed steps:
