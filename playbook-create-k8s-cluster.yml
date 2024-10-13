@@ -155,6 +155,27 @@
       register: kubeadm_init_result
       ignore_errors: yes  # Ignore the error if it fails
 
+    - name: Extract join command and next three lines
+      set_fact:
+        join_command: >
+          {%- set start = kubeadm_init_result.stdout_lines.index(kubeadm_init_result.stdout_lines | select('search', '^kubeadm join') | list | first) %}
+          {{ kubeadm_init_result.stdout_lines[start:start + 4] | join(' ') }}
+
+    - name: Display join command
+      debug:
+        msg: "Join command: {{ join_command }}"
+    
+    - name: Save join command to a file
+      copy:
+        content: "{{ join_command }}"
+        dest: /tmp/join_command.txt
+
+    - name: fetch join command to host
+      fetch: 
+        src: /tmp/join_command.txt
+        dest: /tmp/join_command.txt
+        flat: yes
+
     - name: Check if kubeadm init was successful or already run
       set_fact:
         kubeadm_initialized: "{{ kubeadm_init_result.rc == 0 }}"
@@ -180,55 +201,37 @@
     - name: Change ownership of .kube/config
       command: sudo chown {{ ansible_user }}:{{ ansible_user }} .kube/config
          
-    # - name: get join command
-    #   shell: kubeadm token create --print-join-command
-    #   register: join_command_raw
-
-    # - name: set join command
-    #   set_fact:
-    #     join_command: "{{ join_command_raw.stdout }}"
-
-    # - name: Save join command to a file
-    #   copy:
-    #     content: "{{ join_command }}"
-    #     dest: /tmp/join_command.txt
-
-    # - name: fetch join command to host
-    #   fetch: 
-    #     src: /tmp/join_command.txt
-    #     dest: /tmp/join_command.txt
-    #     flat: yes
         
 
-# - name: Configure worker-nodes to join 
-#   hosts: worker-node
-#   become: yes
-#   tasks:
-#   - name: Copy join command to worker-node
-#     copy:
-#       src: /tmp/join_command.txt
-#       dest: /tmp/
+- name: Configure worker-nodes to join 
+  hosts: worker-node
+  become: yes
+  tasks:
+  - name: Copy join command to worker-node
+    copy:
+      src: /tmp/join_command.txt
+      dest: /tmp/
       
 
-#   - name: join cluster
-#     shell: "{{ lookup('file', '/tmp/join_command.txt') }} > node_joined.txt"
-#     args:
-#       chdir: $HOME
-#       creates: node_joined.txt
+  - name: join cluster
+    shell: "{{ lookup('file', '/tmp/join_command.txt') }} > node_joined.txt"
+    args:
+      chdir: $HOME
+      creates: node_joined.txt
 
-# - name: Apply CNI flannel on master-node
-#   hosts: master-node
-#   tasks:
-#     - name: Copy kube-flannel.yml to the master-node
-#       copy:
-#         src: ./kube-flannel.yml
-#         dest: ./kube-flannel.yml
+- name: Apply CNI flannel on master-node
+  hosts: master-node
+  tasks:
+    - name: Copy kube-flannel.yml to the master-node
+      copy:
+        src: ./kube-flannel.yml
+        dest: ./kube-flannel.yml
 
-#     - name: Check if Flannel network is already applied
-#       command: ip a show flannel.1
-#       register: flannel_network
-#       ignore_errors: yes
+    - name: Check if Flannel network is already applied
+      command: ip a show flannel.1
+      register: flannel_network
+      ignore_errors: yes
 
-#     - name: Apply Flannel network configuration
-#       command: kubectl apply -f kube-flannel.yml
-#       when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
+    - name: Apply Flannel network configuration
+      command: kubectl apply -f kube-flannel.yml
+      when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
