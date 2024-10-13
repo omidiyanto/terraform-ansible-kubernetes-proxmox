@@ -216,7 +216,7 @@
   become: yes
   tasks:
   - name: Copy join command to worker-node
-    Copy:
+    copy:
       src: /tmp/join_command.txt
       dest: /tmp/
       flat: yes
