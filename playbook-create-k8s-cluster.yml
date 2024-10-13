@@ -174,27 +174,21 @@
     - name: Apply Flannel network configuration
       command: kubectl apply -f kube-flannel.yml
       
-    - name: Create join command
-      command: kubeadm token create --print-join-command
-      register: join_command
+    - name: get join command
+      shell: kubeadm token create --print-join-command
+      register: join_command_raw
 
-    - name: Set join command as group variable
+    - name: set join command
       set_fact:
-        ansible_group_join_command: "{{ join_command.stdout }}"
-        group: master-node
-
-    - name: Show join command
-      debug:
-        var: ansible_group_join_command
+        join_command: "{{ join_command_raw.stdout_lines[0] }}"
 
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
   tasks:
-    - name: Check join command
-      debug:
-        var: hostvars['master-node']['ansible_group_join_command']
 
-    - name: Join worker node to the cluster
-      command: "{{ hostvars['master-node']['ansible_group_join_command'] }}"
-      when: hostvars['master-node']['ansible_group_join_command'] is defined
+- name: join cluster
+  shell: "{{ hostvars['soldier76'].join_command }} > node_joined.txt"
+  args:
+    chdir: $HOME
+    creates: node_joined.txt
