@@ -184,14 +184,25 @@
 
     - name: set join command
       set_fact:
-        join_command: "{{ join_command_raw.stdout_lines[0] }}"
+        join_command: "{{ join_command_raw.stdout }}"
+
+    - name: Save join command to a file
+      copy:
+        content: "{{ join_command }}"
+        dest: /tmp/join_command.txt
 
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
   tasks:
+  - name: Retrieve join command from master
+    fetch:
+      src: /tmp/join_command.txt
+      dest: /tmp/
+      flat: yes
+
   - name: join cluster
-    shell: "{{ hostvars['master-node'].join_command }} > node_joined.txt"
+    shell: "{{ lookup('file', '/tmp/join_command.txt') }} > node_joined.txt"
     args:
       chdir: $HOME
       creates: node_joined.txt
