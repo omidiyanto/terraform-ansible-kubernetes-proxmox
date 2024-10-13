@@ -209,14 +209,14 @@
     - name: fetch join command to host
       fetch: 
         src: /tmp/join_command.txt
-        dest: /tmp/join_command.txt
+        
 
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
   tasks:
-  - name: Retrieve join command from master
-    fetch:
+  - name: Copy join command to worker-node
+    Copy:
       src: /tmp/join_command.txt
       dest: /tmp/
       flat: yes
