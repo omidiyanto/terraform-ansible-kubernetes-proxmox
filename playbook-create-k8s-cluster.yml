@@ -142,14 +142,6 @@
   hosts: master-node
   become: yes
   tasks:
-#     - name: Remove containerd config file
-#       command: rm -rf /etc/containerd/config.toml
-
-#     - name: Restart containerd service
-#       systemd:
-#         name: containerd.service
-#         state: restarted
-
     - name: Initialize Kubernetes master-node
       command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
       register: kubeadm_init_result
@@ -157,17 +149,17 @@
 
     - name: Get join command
       command: kubeadm token create --print-join-command
-      register: kubeadm_join_command
+      register: kubeadm_join_command_raw
+    
+    - name: set join command
+      set_fact:
+        kubeadm_join_command: "{{ kubeadm_join_command_raw.stdout }}"
 
     - name: Save join command to file
       copy:
         dest: /tmp/join_command.txt
         content: "{{ kubeadm_join_command }}"
-
-    - name: Display  join command
-      debug:
-        msg: "Join command: {{ kubeadm_join_command }}"
-    
+  
     - name: Save join command to a file
       copy:
         content: "{{ kubeadm_join_command }}"
@@ -205,7 +197,6 @@
       command: sudo chown {{ ansible_user }}:{{ ansible_user }} .kube/config
          
         
-
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
@@ -234,4 +225,4 @@
 
     - name: Apply Flannel network configuration
       command: kubectl apply -f kube-flannel.yml
-      when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
+      when: flannel_network.rc != 0  
