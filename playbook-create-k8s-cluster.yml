@@ -142,12 +142,17 @@
   hosts: master-node
   become: yes
   tasks:
+    - name: Remove containerd config file
+      command: rm -rf /etc/containerd/config.toml
+
+    - name: Restart containerd service
+      systemd:
+        name: containerd.service
+        state: restarted
 
     - name: Initialize Kubernetes master-node
-      command: |
-        rm -rf /etc/containerd/config.toml
-        systemctl restart containerd.service
-        sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
+
       
 
 - name: Finishing Initialization of control-plane (master-node)
