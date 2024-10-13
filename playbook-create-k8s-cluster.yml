@@ -152,6 +152,7 @@
 
     - name: Initialize Kubernetes master-node
       command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
+      when: not ansible_hostname in lookup('pipe', 'kubeadm config view --kubeconfig /etc/kubernetes/admin.conf -o json | jq -r ".kind"') | default('Master')
 
       
 
