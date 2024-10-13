@@ -191,6 +191,11 @@
         content: "{{ join_command }}"
         dest: /tmp/join_command.txt
 
+    - name: Copy join command to host
+      copy: 
+        src: /tmp/join_command.txt
+        dest: /tmp/join_command.txt
+
 - name: Configure worker-nodes to join 
   hosts: worker-node
   become: yes
