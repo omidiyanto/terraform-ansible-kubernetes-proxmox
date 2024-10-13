@@ -142,14 +142,13 @@
   hosts: master-node
   become: yes
   tasks:
-    - name: Remove old containerd config.toml
+
+    - name: Initialize Kubernetes master-node
       command: |
         rm -rf /etc/containerd/config.toml
         systemctl restart containerd.service
-
-    - name: Initialize Kubernetes cluster
-      command: sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
-      register: kubeadm_output
+        sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
+      
 
 - name: Finishing Initialization of control-plane (master-node)
   hosts: master-node
@@ -187,7 +186,7 @@
   become: yes
   tasks:
   - name: join cluster
-    shell: "{{ hostvars['soldier76'].join_command }} > node_joined.txt"
+    shell: "{{ hostvars['master-node'].join_command }} > node_joined.txt"
     args:
       chdir: $HOME
       creates: node_joined.txt
