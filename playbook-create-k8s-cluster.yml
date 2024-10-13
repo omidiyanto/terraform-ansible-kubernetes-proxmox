@@ -228,7 +228,7 @@
     copy:
       src: /tmp/join_command.txt
       dest: /tmp/
-      flat: yes
+      
 
   - name: join cluster
     shell: "{{ lookup('file', '/tmp/join_command.txt') }} > node_joined.txt"
