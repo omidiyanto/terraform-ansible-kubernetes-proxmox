@@ -176,8 +176,14 @@
         src: ./kube-flannel.yml
         dest: ./kube-flannel.yml
 
+    - name: Check if Flannel network is already applied
+      command: ip a show flannel.1
+      register: flannel_network
+      ignore_errors: yes
+
     - name: Apply Flannel network configuration
       command: kubectl apply -f kube-flannel.yml
+      when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
       
     - name: get join command
       shell: kubeadm token create --print-join-command
