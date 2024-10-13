@@ -125,39 +125,6 @@ output "vm_info" {
   }
 }
 
-resource "null_resource" "update_hosts" {
-  depends_on = [
-    proxmox_vm_qemu.k8s-master,
-    proxmox_vm_qemu.k8s-workers
-  ]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      #!/bin/bash
-
-      # Update /etc/hosts for master node
-      if grep -q "${proxmox_vm_qemu.k8s-master.name}" /etc/hosts; then
-        sed -i "s/.*${proxmox_vm_qemu.k8s-master.name}.*/${proxmox_vm_qemu.k8s-master.default_ipv4_address}  ${proxmox_vm_qemu.k8s-master.name}/" /etc/hosts
-      else
-        echo "${proxmox_vm_qemu.k8s-master.default_ipv4_address}  ${proxmox_vm_qemu.k8s-master.name}" >> /etc/hosts
-      fi
-
-      # Update /etc/hosts for worker nodes
-      for worker in ${join(" ", [for worker in proxmox_vm_qemu.k8s-workers : "${worker.name}=${worker.default_ipv4_address}"])};
-      do
-        IFS='=' read -r name ip <<< "\$worker"
-        if grep -q "\$name" /etc/hosts; then
-          sed -i "s/.*\$name.*/\$ip  \$name/" /etc/hosts
-        else
-          echo "\$ip  \$name" >> /etc/hosts
-        fi
-      done
-    EOT
-  }
-}
-
-
-
 resource "local_file" "create_ansible_inventory" {
   depends_on = [
     proxmox_vm_qemu.k8s-master,
