@@ -209,7 +209,8 @@
     - name: fetch join command to host
       fetch: 
         src: /tmp/join_command.txt
-        dest: .
+        dest: /tmp/join_command.txt
+        flat: yes
         
 
 - name: Configure worker-nodes to join 
