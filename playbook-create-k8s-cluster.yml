@@ -138,66 +138,66 @@
         state: started
         enabled: true
 
-- name: Initialization of control-plane (master-node)
-  hosts: master-node
-  become: yes
-  tasks:
-    - name: Remove containerd config file
-      command: rm -rf /etc/containerd/config.toml
+# - name: Initialization of control-plane (master-node)
+#   hosts: master-node
+#   become: yes
+#   tasks:
+#     - name: Remove containerd config file
+#       command: rm -rf /etc/containerd/config.toml
 
-    - name: Restart containerd service
-      systemd:
-        name: containerd.service
-        state: restarted
+#     - name: Restart containerd service
+#       systemd:
+#         name: containerd.service
+#         state: restarted
 
-    - name: Initialize Kubernetes master-node
-      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
-      register: kubeadm_init_result
-      ignore_errors: yes  # Ignore the error if it fails
+#     - name: Initialize Kubernetes master-node
+#       command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
+#       register: kubeadm_init_result
+#       ignore_errors: yes  # Ignore the error if it fails
 
-    - name: Check if kubeadm init was successful or already run
-      set_fact:
-        kubeadm_initialized: "{{ kubeadm_init_result.rc == 0 }}"
+#     - name: Check if kubeadm init was successful or already run
+#       set_fact:
+#         kubeadm_initialized: "{{ kubeadm_init_result.rc == 0 }}"
 
-    - name: Skip initialization if already done
-      debug:
-        msg: "Kubernetes master-node already initialized, skipping."
-      when: kubeadm_initialized
+#     - name: Skip initialization if already done
+#       debug:
+#         msg: "Kubernetes master-node already initialized, skipping."
+#       when: kubeadm_initialized
     
       
-- name: Finishing Initialization of control-plane (master-node)
-  hosts: master-node
-  tasks:
-    - name: Create .kube directory
-      file:
-        path: ".kube"
-        state: directory
-        mode: '0755'
+# - name: Finishing Initialization of control-plane (master-node)
+#   hosts: master-node
+#   tasks:
+#     - name: Create .kube directory
+#       file:
+#         path: ".kube"
+#         state: directory
+#         mode: '0755'
 
-    - name: Copy admin.conf to .kube/config
-      command: sudo cp -f /etc/kubernetes/admin.conf .kube/config
+#     - name: Copy admin.conf to .kube/config
+#       command: sudo cp -f /etc/kubernetes/admin.conf .kube/config
       
-    - name: Change ownership of .kube/config
-      command: sudo chown {{ ansible_user }}:{{ ansible_user }} .kube/config
+#     - name: Change ownership of .kube/config
+#       command: sudo chown {{ ansible_user }}:{{ ansible_user }} .kube/config
          
-    - name: get join command
-      shell: kubeadm token create --print-join-command
-      register: join_command_raw
+#     - name: get join command
+#       shell: kubeadm token create --print-join-command
+#       register: join_command_raw
 
-    - name: set join command
-      set_fact:
-        join_command: "{{ join_command_raw.stdout }}"
+#     - name: set join command
+#       set_fact:
+#         join_command: "{{ join_command_raw.stdout }}"
 
-    - name: Save join command to a file
-      copy:
-        content: "{{ join_command }}"
-        dest: /tmp/join_command.txt
+#     - name: Save join command to a file
+#       copy:
+#         content: "{{ join_command }}"
+#         dest: /tmp/join_command.txt
 
-    - name: fetch join command to host
-      fetch: 
-        src: /tmp/join_command.txt
-        dest: /tmp/join_command.txt
-        flat: yes
+#     - name: fetch join command to host
+#       fetch: 
+#         src: /tmp/join_command.txt
+#         dest: /tmp/join_command.txt
+#         flat: yes
         
 
 # - name: Configure worker-nodes to join 
