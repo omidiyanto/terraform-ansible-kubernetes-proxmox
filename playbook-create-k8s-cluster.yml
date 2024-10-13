@@ -192,7 +192,12 @@
     - name: Apply Flannel network configuration
       command: kubectl apply -f kube-flannel.yml
       when: flannel_network.rc != 0  # Only run if the command to check the Flannel network failed
-      
+    
+    - name: restart kubelet service
+      systemd:
+        name: kubelet.service
+        state: restarted
+        
     - name: get join command
       shell: kubeadm token create --print-join-command
       register: join_command_raw
