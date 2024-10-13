@@ -152,10 +152,18 @@
 
     - name: Initialize Kubernetes master-node
       command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_host }}
-      when: not ansible_hostname in lookup('pipe', 'kubeadm config view --kubeconfig /etc/kubernetes/admin.conf -o json | jq -r ".kind"') | default('Master')
+      register: kubeadm_init_result
+      ignore_errors: yes  # Ignore the error if it fails
 
+    - name: Check if kubeadm init was successful or already run
+      set_fact:
+        kubeadm_initialized: "{{ kubeadm_init_result.rc == 0 }}"
+
+    - name: Skip initialization if already done
+      debug:
+        msg: "Kubernetes master-node already initialized, skipping."
+      when: kubeadm_initialized
       
-
 - name: Finishing Initialization of control-plane (master-node)
   hosts: master-node
   tasks:
