@@ -12,9 +12,7 @@ read -p "Enter Cloud init user name: " USER_NAME
 read -sp "Enter Cloud init user password: " USER_PASSWORD
 echo ""
 read -p "Enter Cloud init SSH Public Key Path: " CLOUDINIT_SSH_PUBKEY_LOCATION
-echo ""
-echo "############################  STARTING  ###################################"
-
+echo "############################  STARTING  ###########################################"
 apt update -y &>/dev/null
 apt install libguestfs-tools -y &>/dev/null
 
@@ -50,8 +48,8 @@ qm set ${VM_ID} --ciuser ${USER_NAME} &>/dev/null
 qm set ${VM_ID} --cipassword "${USER_PASSWORD}" &>/dev/null
 qm set ${VM_ID} --sshkeys ${CLOUDINIT_SSH_PUBKEY_LOCATION} &>/dev/null
 qm template "${VM_ID}" &>/dev/null
-echo ""
-echo ""
 echo "VM ${VM_NAME} has been converted to a template!!!"
-echo "#####################  FINISH  ###########################"
+echo "############################  FINISH  #############################################"
+echo ""
+echo ""
 
