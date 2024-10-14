@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # prompt user to choose
+clear
 echo "#####################  CREATE VM TEMPLATE ON PROXMOX VE  ###########################"
 read -p "Please enter image URL: " CLOUD_IMAGES_URL
 read -p "Please enter the image name: " IMAGE_NAME
