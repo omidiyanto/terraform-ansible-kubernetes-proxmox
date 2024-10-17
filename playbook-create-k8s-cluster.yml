@@ -36,6 +36,10 @@
           - apt-transport-https
           - gpg
         state: present
+      register: apt_result
+      until: apt_result is success
+      retries: 5
+      delay: 10
     
     - name: Create directory for Docker GPG key
       file:
