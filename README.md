@@ -1,15 +1,14 @@
-# CA Injector for Kubernetes 💉
-
+# 🌟 Kubernetes (K8s) Cluster Automation on Proxmox VE with Terraform and Ansible🚀
 <div align="center">
-    <a href="https://sonarcloud.io/summary/new_code?id=omidiyanto_k8s-ca-injector">
-        <img src="https://sonarcloud.io/api/project_badges/measure?project=omidiyanto_k8s-ca-injector&metric=alert_status" alt="Quality Gate Status">
-    </a>
-    <br>
+    <!-- Your badges here -->
     <img src="https://img.shields.io/badge/kubernetes-blue?style=for-the-badge&logo=kubernetes&logoColor=white">
-    <img src="https://img.shields.io/badge/docker-green.svg?style=for-the-badge&logo=docker&logoColor=black">
-    <img src="https://img.shields.io/badge/helm-red?style=for-the-badge&logo=helm&logoColor=white">
+    <img src="https://img.shields.io/badge/terraform-%238511FA.svg?style=for-the-badge&logo=terraform&logoColor=white">
+    <img src="https://img.shields.io/badge/ansible-%23000.svg?style=for-the-badge&logo=ansible&logoColor=white">
+    <img src="https://img.shields.io/badge/proxmox-%23FF6F00.svg?style=for-the-badge&logo=proxmox&logoColor=white">
+    <img src="https://img.shields.io/badge/ubuntu-%23D00000.svg?style=for-the-badge&logo=ubuntu&logoColor=white">
 </div>
 <br>
+
 
 Welcome to the **Kubernetes Cluster Automation on Proxmox VE with Terraform and Ansible** project! This repository is designed to help you effortlessly set up a robust Kubernetes (K8s) cluster using **Terraform** and **Ansible**. If you're looking to streamline your K8s deployment process on Proxmox Virtual Environment, you’re in the right place!
 
